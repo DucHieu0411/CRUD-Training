@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { getAllUsers } from "../../Axios/UserService";
+import ModalAddNew from "../modal/ModalAddNew";
 
 const TableUsers = () => {
   const [listUsers, setListUsers] = useState([]);
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
+  const [isShowModalAddNew, setIsShowModalAddNew] = useState(false);
   const getUsers = async (page) => {
     const res = await getAllUsers(page);
     if (res && res.data) {
@@ -19,6 +21,14 @@ const TableUsers = () => {
 
   const handleChange = (e) => {
     getUsers(+e.selected + 1);
+  };
+
+  const handleClose = () => {
+    setIsShowModalAddNew(false);
+  };
+
+  const handleUpdate = (user) => {
+    setListUsers([...listUsers, user]);
   };
 
   useEffect(() => {
@@ -35,7 +45,12 @@ const TableUsers = () => {
         }}
       >
         <span>List Users: </span>
-        <button className="btn btn-success">Add new user</button>
+        <button
+          className="btn btn-success"
+          onClick={() => setIsShowModalAddNew(true)}
+        >
+          Add new user
+        </button>
       </div>
 
       <div className="col-4 my-3">
@@ -107,6 +122,12 @@ const TableUsers = () => {
             })}
         </tbody>
       </Table>
+
+      <ModalAddNew
+        show={isShowModalAddNew}
+        handleClose={handleClose}
+        handleUpdate={handleUpdate}
+      />
 
       <ReactPaginate
         breakLabel="..."

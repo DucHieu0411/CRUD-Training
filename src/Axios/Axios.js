@@ -2,6 +2,9 @@ import axios from "axios";
 
 const Axios = axios.create({
   baseURL: "https://reqres.in/api",
+  headers: {
+    "x-api-key": "reqres-free-v1",
+  },
 });
 
 // Add a request interceptor

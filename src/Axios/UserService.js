@@ -1,11 +1,11 @@
 import Axios from "./Axios";
 
 const getAllUsers = (page) => {
-  return Axios.get(`/users?page=${page}`, {
-    headers: {
-      "x-api-key": "reqres-free-v1",
-    },
-  });
+  return Axios.get(`/users?page=${page}`);
 };
 
-export { getAllUsers };
+const addNewUser = (name, job) => {
+  return Axios.post("/users", { name, job });
+};
+
+export { getAllUsers, addNewUser };
