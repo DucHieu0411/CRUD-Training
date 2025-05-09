@@ -1,11 +1,13 @@
 import "./App.scss";
 import Header from "./components/layout/Header";
+import TableUsers from "./components/layout/TableUsers";
 
 function App() {
   return (
     <>
-      <div className="App">
+      <div className="container">
         <Header />
+        <TableUsers />
       </div>
     </>
   );
