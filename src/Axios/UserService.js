@@ -8,4 +8,8 @@ const addNewUser = (name, job) => {
   return Axios.post("/users", { name, job });
 };
 
-export { getAllUsers, addNewUser };
+const updateUser = (name, job) => {
+  return Axios.put(`/api/users/`, { name, job });
+};
+
+export { getAllUsers, addNewUser, updateUser };

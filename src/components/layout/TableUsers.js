@@ -3,6 +3,8 @@ import { Table } from "react-bootstrap";
 import ReactPaginate from "react-paginate";
 import { getAllUsers } from "../../Axios/UserService";
 import ModalAddNew from "../modal/ModalAddNew";
+import ModalEdit from "../modal/ModalEdit";
+import _ from "lodash";
 
 const TableUsers = () => {
   const [listUsers, setListUsers] = useState([]);
@@ -10,6 +12,9 @@ const TableUsers = () => {
   const [totalPages, setTotalPages] = useState(0);
 
   const [isShowModalAddNew, setIsShowModalAddNew] = useState(false);
+  const [isShowModalEdit, setIsShowModalEdit] = useState(false);
+
+  const [getDataUser, setGetDataUser] = useState({});
   const getUsers = async (page) => {
     const res = await getAllUsers(page);
     if (res && res.data) {
@@ -25,10 +30,23 @@ const TableUsers = () => {
 
   const handleClose = () => {
     setIsShowModalAddNew(false);
+    setIsShowModalEdit(false);
   };
 
   const handleUpdate = (user) => {
     setListUsers([...listUsers, user]);
+  };
+
+  const handleEditUser = (user) => {
+    setIsShowModalEdit(true);
+    setGetDataUser(user);
+  };
+
+  const handleEditUserFromModal = (user) => {
+    const cloneListUsers = _.cloneDeep(listUsers);
+    const index = listUsers.findIndex((item) => item.id === user.id);
+    cloneListUsers[index].first_name = user.first_name;
+    setListUsers(cloneListUsers);
   };
 
   useEffect(() => {
@@ -114,7 +132,12 @@ const TableUsers = () => {
                   <td
                     style={{ display: "flex", justifyContent: "space-evenly" }}
                   >
-                    <button className="btn btn-warning">Edit</button>
+                    <button
+                      className="btn btn-warning"
+                      onClick={() => handleEditUser(item)}
+                    >
+                      Edit
+                    </button>
                     <button className="btn btn-danger">Delete</button>
                   </td>
                 </tr>
@@ -124,9 +147,16 @@ const TableUsers = () => {
       </Table>
 
       <ModalAddNew
-        show={isShowModalAddNew}
+        show={isShowModalEdit}
         handleClose={handleClose}
         handleUpdate={handleUpdate}
+      />
+
+      <ModalEdit
+        show={isShowModalEdit}
+        handleClose={handleClose}
+        getDataUser={getDataUser}
+        handleEditUserFromModal={handleEditUserFromModal}
       />
 
       <ReactPaginate

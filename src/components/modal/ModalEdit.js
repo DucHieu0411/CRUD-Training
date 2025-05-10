@@ -1,10 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
+import { updateUser } from "../../Axios/UserService";
+import { toast } from "react-toastify";
 
 const ModalEdit = (props) => {
-  const { show, handleClose } = props;
+  const { show, handleClose, getDataUser, handleEditUserFromModal } = props;
   const [name, setName] = useState("");
   const [job, setJob] = useState("");
+
+  const handleUpdate = async () => {
+    const res = await updateUser(name, job);
+    if (res && res.updatedAt) {
+      handleEditUserFromModal({
+        first_name: name,
+        id: getDataUser.id,
+      });
+      handleClose();
+      toast.success("Update user successfully!");
+    }
+  };
+
+  useEffect(() => {
+    if (show) {
+      setName(getDataUser.first_name);
+    }
+  }, [getDataUser]);
 
   return (
     <>
@@ -42,8 +62,12 @@ const ModalEdit = (props) => {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary">Close</Button>
-          <Button variant="primary">Save Changes</Button>
+          <Button variant="secondary" onClick={() => handleClose()}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={() => handleUpdate()}>
+            Save Changes
+          </Button>
         </Modal.Footer>
       </Modal>
     </>
