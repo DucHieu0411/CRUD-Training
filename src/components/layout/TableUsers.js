@@ -4,7 +4,8 @@ import ReactPaginate from "react-paginate";
 import { getAllUsers } from "../../Axios/UserService";
 import ModalAddNew from "../modal/ModalAddNew";
 import ModalEdit from "../modal/ModalEdit";
-import _ from "lodash";
+import _, { debounce } from "lodash";
+import ModalDelete from "../modal/ModalDelete";
 
 const TableUsers = () => {
   const [listUsers, setListUsers] = useState([]);
@@ -13,8 +14,10 @@ const TableUsers = () => {
 
   const [isShowModalAddNew, setIsShowModalAddNew] = useState(false);
   const [isShowModalEdit, setIsShowModalEdit] = useState(false);
+  const [isShowModalDelete, setIsShowModalDelete] = useState(false);
 
-  const [getDataUser, setGetDataUser] = useState({});
+  const [getDataUserEdit, setGetDataUserEdit] = useState({});
+  const [getDataUserDelete, setGetDataUserDelete] = useState({});
   const getUsers = async (page) => {
     const res = await getAllUsers(page);
     if (res && res.data) {
@@ -31,6 +34,7 @@ const TableUsers = () => {
   const handleClose = () => {
     setIsShowModalAddNew(false);
     setIsShowModalEdit(false);
+    setIsShowModalDelete(false);
   };
 
   const handleUpdate = (user) => {
@@ -39,7 +43,12 @@ const TableUsers = () => {
 
   const handleEditUser = (user) => {
     setIsShowModalEdit(true);
-    setGetDataUser(user);
+    setGetDataUserEdit(user);
+  };
+
+  const handleDeleteUser = (user) => {
+    setIsShowModalDelete(true);
+    setGetDataUserDelete(user);
   };
 
   const handleEditUserFromModal = (user) => {
@@ -48,6 +57,25 @@ const TableUsers = () => {
     cloneListUsers[index].first_name = user.first_name;
     setListUsers(cloneListUsers);
   };
+
+  const handleDeleteUserFromModal = (user) => {
+    const cloneListUsers = _.cloneDeep(listUsers);
+    const deleteUser = cloneListUsers.filter((item) => item.id !== user.id);
+    setListUsers(deleteUser);
+  };
+
+  const handleSearch = debounce((e) => {
+    const term = e.target.value;
+    if (term) {
+      const cloneListUsers = _.cloneDeep(listUsers);
+      const searchEmailUser = cloneListUsers.filter((item) =>
+        item.email.includes(term)
+      );
+      setListUsers(searchEmailUser);
+    } else {
+      getUsers(1);
+    }
+  }, 200);
 
   useEffect(() => {
     getUsers(1);
@@ -72,7 +100,12 @@ const TableUsers = () => {
       </div>
 
       <div className="col-4 my-3">
-        <input className="form-control" placeholder="Search user by email..." />
+        <input
+          className="form-control"
+          placeholder="Search user by email..."
+          style={{ outline: "double" }}
+          onChange={(e) => handleSearch(e)}
+        />
       </div>
 
       <Table striped bordered hover>
@@ -138,7 +171,12 @@ const TableUsers = () => {
                     >
                       Edit
                     </button>
-                    <button className="btn btn-danger">Delete</button>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleDeleteUser(item)}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               );
@@ -155,8 +193,15 @@ const TableUsers = () => {
       <ModalEdit
         show={isShowModalEdit}
         handleClose={handleClose}
-        getDataUser={getDataUser}
+        getDataUser={getDataUserEdit}
         handleEditUserFromModal={handleEditUserFromModal}
+      />
+
+      <ModalDelete
+        show={isShowModalDelete}
+        handleClose={handleClose}
+        getDataUser={getDataUserDelete}
+        handleDeleteUserFromModal={handleDeleteUserFromModal}
       />
 
       <ReactPaginate

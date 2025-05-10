@@ -12,4 +12,8 @@ const updateUser = (name, job) => {
   return Axios.put(`/api/users/`, { name, job });
 };
 
-export { getAllUsers, addNewUser, updateUser };
+const deleteUser = (id) => {
+  return Axios.delete(`/api/users/${id}`);
+};
+
+export { getAllUsers, addNewUser, updateUser, deleteUser };
